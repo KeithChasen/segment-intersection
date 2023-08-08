@@ -21,23 +21,70 @@
         const D = { x: 250, y: 200 };
 
         const ctx = myCanvas.getContext('2d');
+        
+        let t = 0;
+        animate();
+        
+        function animate() {
+            ctx.clearRect(0,0,myCanvas.width, myCanvas.height);
 
-        ctx.beginPath();
+            ctx.beginPath();
 
-        // line A - B
-        ctx.moveTo(A.x, A.y);
-        ctx.lineTo(B.x, B.y);
+            // line A - B
+            ctx.moveTo(A.x, A.y);
+            ctx.lineTo(B.x, B.y);
 
-        // line C - D
-        ctx.moveTo(C.x, C.y);
-        ctx.lineTo(D.x, D.y);
+            // line C - D
+            ctx.moveTo(C.x, C.y);
+            ctx.lineTo(D.x, D.y);
 
-        ctx.stroke();
+            ctx.stroke();
 
-        function drawDot(point, label) {
+            drawDot(A, 'A');
+            drawDot(B, 'B');
+
+            drawDot(C, 'C');
+            drawDot(D, 'D');
+
+            // find middle between A - B
+            const M = {
+                // find x between A - B(exactly in the middle 0.5)
+                x: lerp (A.x, B.x, t),
+                y: lerp (A.y, B.y, t),
+            }
+
+            drawDot(M, 'M', t<0 || t>1);
+
+            // // find middle between C - D
+            const N = {
+                // find x between C - D(exactly in the middle 0.5)
+                x: lerp (C.x, D.x, t),
+                y: lerp (C.y, D.y, t),
+            }
+
+            // NOTE: having same "t" for M and N
+            // makes so they never intersect
+
+            // so we need to solve a problem
+            // find values where these lines are intersecting
+
+            drawDot(N, 'N', t<0 || t>1);
+
+            t+=0.005;
+            requestAnimationFrame(animate);
+        }
+
+        // A - first coordinate
+        // B - second coordinate
+        // t - percentage
+        function lerp(A, B, t) {
+            return A + (B - A) * t;
+        }
+
+        function drawDot(point, label, isRed) {
             // draw circle for letter
             ctx.beginPath();
-            ctx.fillStyle = 'white';
+            ctx.fillStyle = isRed ? 'red' : 'white';
             ctx.arc(point.x, point.y, 10, 0, Math.PI * 2);
             ctx.fill();
             ctx.stroke();
@@ -48,39 +95,6 @@
             ctx.textBaseline = 'middle';
             ctx.font = "bold 10px Arial";
             ctx.fillText(label, point.x, point.y);
-        }
-
-        drawDot(A, 'A');
-        drawDot(B, 'B');
-
-        drawDot(C, 'C');
-        drawDot(D, 'D');
-
-        let t = 0.5;
-
-        // find middle between A - B
-        const M1 = {
-            // find x between A - B(exactly in the middle 0.5)
-            x: lerp (A.x, B.x, t),
-            y: lerp (A.y, B.y, t),
-        }
-
-        drawDot(M1, 'M1');
-
-        // // find middle between C - D
-        const M2 = {
-            // find x between C - D(exactly in the middle 0.5)
-            x: lerp (C.x, D.x, t),
-            y: lerp (C.y, D.y, t),
-        }
-
-        drawDot(M2, 'M2');
-
-        // A - first coordinate
-        // B - second coordinate
-        // t - percentage
-        function lerp(A, B, t) {
-            return A + (B - A) * t;
         }
         
 
