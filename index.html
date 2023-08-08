@@ -46,7 +46,7 @@
             ctx.fillStyle = 'black';
             ctx.textAlign = 'center';
             ctx.textBaseline = 'middle';
-            ctx.font = "bold 14px Arial";
+            ctx.font = "bold 10px Arial";
             ctx.fillText(label, point.x, point.y);
         }
 
@@ -55,6 +55,33 @@
 
         drawDot(C, 'C');
         drawDot(D, 'D');
+
+        let t = 0.5;
+
+        // find middle between A - B
+        const M1 = {
+            // find x between A - B(exactly in the middle 0.5)
+            x: lerp (A.x, B.x, t),
+            y: lerp (A.y, B.y, t),
+        }
+
+        drawDot(M1, 'M1');
+
+        // // find middle between C - D
+        const M2 = {
+            // find x between C - D(exactly in the middle 0.5)
+            x: lerp (C.x, D.x, t),
+            y: lerp (C.y, D.y, t),
+        }
+
+        drawDot(M2, 'M2');
+
+        // A - first coordinate
+        // B - second coordinate
+        // t - percentage
+        function lerp(A, B, t) {
+            return A + (B - A) * t;
+        }
         
 
     </script>
