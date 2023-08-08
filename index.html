@@ -22,7 +22,6 @@
 
         const ctx = myCanvas.getContext('2d');
         
-        let t = 0;
         animate();
         
         function animate() {
@@ -46,31 +45,9 @@
             drawDot(C, 'C');
             drawDot(D, 'D');
 
-            // find middle between A - B
-            const M = {
-                // find x between A - B(exactly in the middle 0.5)
-                x: lerp (A.x, B.x, t),
-                y: lerp (A.y, B.y, t),
-            }
+            const I = getIntersection(A,B,C,D);
+            drawDot(I, 'I');    
 
-            drawDot(M, 'M', t<0 || t>1);
-
-            // // find middle between C - D
-            const N = {
-                // find x between C - D(exactly in the middle 0.5)
-                x: lerp (C.x, D.x, t),
-                y: lerp (C.y, D.y, t),
-            }
-
-            // NOTE: having same "t" for M and N
-            // makes so they never intersect
-
-            // so we need to solve a problem
-            // find values where these lines are intersecting
-
-            drawDot(N, 'N', t<0 || t>1);
-
-            t+=0.005;
             requestAnimationFrame(animate);
         }
 
@@ -95,6 +72,73 @@
             ctx.textBaseline = 'middle';
             ctx.font = "bold 10px Arial";
             ctx.fillText(label, point.x, point.y);
+        }
+
+        function getIntersection(A, B, C, D) {
+            /*
+                Math NOTES
+
+                if we need to find 
+                intersections between 2 lines
+
+                the coordinates of these 2 lines 
+                should satisfy these equations:
+
+                //lerp functions:
+
+                { system of two equations }
+                Ix = Ax + (Bx - Ax)t = Cx + (Dx - Cx)u
+                Iy = Ay + (By - Ay)t = Cy + (Dy - Cy)u
+
+                1st equation
+                Ax + (Bx - Ax)t = Cx + (Dx - Cx)u | let's subtract -C
+                (Ax - Cx) + (Bx - Ax)t = (Dx - Cx)u
+
+                2nd equation
+                Ay + (By - Ay)t = Cy + (Dy - Cy)u | let's subtract -Cy
+                (Ay - Cy) + (By - Ay)t = (Dy - Cy)u | * (Dx - Cx)
+
+                (Dx-Cx)(Ay-Cy)+(Dx-Cx)(By-Ay)t = (Dy-Cy)(Dx-Cx)u | Dx - Cx is the same in the 1st equation
+                             THIS:       (Ax - Cx) + (Bx - Ax)t = (Dx - Cx)u
+                SO this become:
+                    (Dx-Cx)(Ay-Cy)+(Dx-Cx)(By-Ay)t = 
+                           (Dy-Cy)(Ax-Cx) + (Dy-Cy)(Bx-Ax)t | -(Dy-Cy)(Ax-Cx)
+                                                                | -(Dx-Cx)(By-Ay)t
+
+                SO:
+
+                    (Dx-Cx)(Ay-Cy)-(Dy-Cy)(Ax-Cx) =
+                    (Dy-Cy)(Bx-Ax)t-(Dx-Cx)(By-Ay)t | extract t
+
+                SO:        
+                    (Dx-Cx)(Ay-Cy)-(Dy-Cy)(Ax-Cx) =
+                    ((Dy-Cy)(Bx-Ax)-(Dx-Cx)(By-Ay))t
+
+                SO t is
+                
+                t = (Dx-Cx)(Ay-Cy)-(Dy-Cy)(Ax-Cx) / (Dy-Cy)(Bx-Ax)-(Dx-Cx)(By-Ay)
+
+                2nd equation would be
+
+                when using in code we separate
+
+                TOP = (Dx-Cx)(Ay-Cy)-(Dy-Cy)(Ax-Cx)
+                BOTTOM = (Dy-Cy)(Bx-Ax)-(Dx-Cx)(By-Ay)
+
+                t = TOP / BOTTOM 
+
+                so we need to check the BOTTOM is NOT ZERO!
+            */
+
+            const top = (D.x-C.x)*(A.y-C.y)-(D.y-C.y)*(A.x-C.x);
+            const bottom = (D.y-C.y)*(B.x-A.x)-(D.x-C.x)*(B.y-A.y);
+
+            t = top/bottom;
+
+            return {
+                x: lerp(A.x, B.x, t),
+                y: lerp(A.y, B.y, t)
+            }
         }
         
 
